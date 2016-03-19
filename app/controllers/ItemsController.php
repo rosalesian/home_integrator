@@ -209,5 +209,127 @@ class ItemsController extends \BaseController {
             ->make();
     }
 
+   //mobile
+    public function getItemsMobile()
+    {
+    	$response = [];
+    	$items = Item::all();
+    	for ($i=0; $i < sizeof($items); $i++) { 
+    		$response_array = [
+    				'server_id' => $items[$i]->id,
+    				'user_id' => $items[$i]->user_id,
+                    'reference_id' => $items[$i]->reference_id,
+    				'name' => $items[$i]->name,
+    				'updated_humans' => $items[$i]->created_at->diffForHumans(),
+    				'created_humans' => $items[$i]->created_at->diffForHumans(),
+    				'created_at' => date($items[$i]->created_at),
+    				'updated_at' => date($items[$i]->updated_at)
+    			];
+    			$response[] = $response_array;
+    	}
+    	return Response::json($response);
+    }
+
+    public function addItemsMobile()
+    {
+
+       $result = Item::searchByReference(Input::get('reference'));
+       if($result != null && $result != "")
+        {
+            $response = [
+                'name' => Input::get('name'),
+                'reference' => Input::get('reference'),
+                'result' => $result,
+                'message' => 'Already Exist'
+            ];
+        }
+        else
+        {
+            $data = [
+                'name' => Input::get('name'),
+                'reference_id' => Input::get('reference'),
+                'user_id' => Auth::user()->id,
+            ];
+
+            $item = Item::create($data);
+
+            $response = [
+                'status_code' => 22,
+                'error' => false,
+                'message' => 'Successfully Added',
+                'id' => $item->id,
+            ];
+        }
+        return Response::json($response);
+    }
+
+    public function updateItemsMobile()
+    {
+
+        $id = Input::get('id');
+        $item = Item::find($id);
+        if($item)
+        {
+
+            $data = [
+                'name' => Input::get('name'),
+                'reference' => Input::get('reference'),
+                'id' => Input::get('id'),
+                'user_id' => Auth::user()->id,
+                'updated_at' => date('Y-m-d h:i:s')
+            ];
+            $item->update($data);
+            $response = [
+                'message' => 'Successfully Updated',
+                'status_code' => 202,
+                'found' => true,
+                'error' => true,
+                'id' => $item->id
+            ];
+        }
+        else
+        {
+            $response = [
+                'message' => 'Not Found',
+                'found' => false,
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => true,
+                'data' => $item
+            ];
+        }
+        return Response::json($response);
+    }
+
+    public function deleteItemsMobile()
+    {
+        $id = Input::get('id');
+        $item = Item::find($id);
+        if($item != null && $item != "")
+        {
+            $item->delete();
+            $response = [
+                'message' => 'Successfully Deleted',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => false,
+                'found' => true,
+                'data' => $item->id
+            ];
+        }
+        else
+        {
+            $response = [
+                'message' => 'Not Found',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => false,
+                'found' => false,
+                'data' => $item
+            ];
+        }
+        return Response::json($response);
+    }
+
 
 }
