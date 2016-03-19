@@ -176,4 +176,100 @@ class OperationsController extends \BaseController {
             })
             ->make();
     }
+      //mobile get customers
+    public function getOperationsMobile() {
+        return Operation::all();
+    }
+    public function addOperationsMobile()
+    {
+        $result=Operation::searchByReference(Input::get('reference'));
+        if($result != null && $result != "")
+        {
+            $response = [
+                'name' => Input::get('name'),
+                'reference' => Input::get('reference'),
+                'result' => $result,
+                'message' => 'Already Exist'
+            ];
+        }
+        else
+        {
+            $data = [
+                'name' => Input::get('name'),
+                'reference_id' => Input::get('reference'),
+                'user_id' => Auth::user()->id,
+            ];
+            $operation = Operation::create($data);
+            $response = [
+                'status_code' => 22,
+                'error' => false,
+                'message' => 'Successfully Added',
+                'id' => $operation->id,
+            ];
+        }
+        return Response::json($response);
+    }
+
+    public function updateOperationsMobile()
+    {
+        $id = Input::get('id');
+        $operation = Operation::find($id);
+        if($operation)
+        {
+            $data = [
+                'name' => Input::get('name'),
+                'reference' => Input::get('reference'),
+                'id' => Input::get('id'),
+                'user_id' => Auth::user()->id,
+                'updated_at' => date('Y-m-d h:i:s')
+            ];
+            $operation->update($data);
+            $response = [
+                'message' => 'Successfully Updated',
+                'status_code' => 202,
+                'error' => true,
+                'id' => $operation->id
+            ];
+        }
+        else
+        {
+            $response = [
+                'message' => 'Not Found',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => true,
+                'data' => $operation
+            ];
+        }
+        return Response::json($response);
+    }
+    public function deleteOperationsMobile()
+    {
+        $id = Input::get('id');
+        $operation = Operation::find($id);
+        if($operation != null && $operation != "")
+        {
+            $operation->delete();
+            $response = [
+                'message' => 'Successfully Deleted',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => false,
+                'found' => false,
+                'data' => $operation->id
+            ];
+        }
+        else
+        {
+            $response = [
+                'message' => 'Not Found',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => false,
+                'found' => true,
+                'data' => $operation
+            ];
+        }
+        return Response::json($response);
+    }
 }

@@ -343,6 +343,73 @@ Route::group(['prefix' => 'api/v2/discounts', 'before'=> 'auth.basic'], function
 
 
 
+Route::group(['prefix' => 'api/mobile/v1', 'before'=> 'auth.basic'] , function(){
+	//Route::post('login', ['uses' => 'UserController@mobileLogin']);
+	Route::post('login', function(){
+		$username = Input::get('username');
+		$password = Input::get('password');
+		if(Auth::attempt(array('username'=>Input::get('username'),'password'=>Input::get('password'))))
+		{
+            $response = [
+			  	'username' => Auth::user()->username,
+			  	'email' => Auth::user()->email,
+			  	'name' => Auth::user()->name,
+			  	'server_id' => Auth::user()->id,
+			  	'created_humans' => Auth::user()->created_at->diffForHumans(),
+			  	'updated_humans' => Auth::user()->updated_at->diffForHumans(),
+			  	'created_at' => date(Auth::user()->created_at),
+			  	'updated_at' => date(Auth::user()->updated_at),
+				'password' => $password,
+				'response_code' => 200,
+				'error' => false
+			];
+        }
+        else
+        {
+        	$response = [
+			  	'username' => "",
+				'email' => $username,
+				'password' => $password,
+				'response_code' => 200,
+				'error' => true
+			];
+       }
+		return Response::json($response);
+	});
+    Route::get('items',['uses'=>'ItemsController@getItemsMobile']);
+    Route::post('items/add', ['uses' => 'ItemsController@addItemsMobile']);
+    Route::post('items/update', ['uses' => 'ItemsController@updateItemsMobile']);
+    Route::post('items/delete', ['uses' => 'ItemsController@deleteItemsMobile']);
+
+	Route::get('customers', ['uses' => 'CustomersController@getCustomersMobile']);
+    Route::post('customers/add', ['uses' => 'CustomersController@addCustomersMobile']);
+    Route::post('customers/update', ['uses' => 'CustomersController@updateCustomersMobile']);
+    Route::post('customers/delete', ['uses' => 'CustomersController@deleteCustomersMobile']);
+
+    Route::get('locations', ['uses' => 'LocationsController@getLocationsMobile']);
+    Route::post('locations/add', ['uses' => 'LocationsController@addLocationsMobile']);
+    Route::post('locations/update', ['uses' => 'LocationsController@updateLocationsMobile']);
+    Route::post('locations/delete', ['uses' => 'LocationsController@deleteLocationsMobile']);
+
+    Route::get('operations', ['uses' => 'OperationsController@getOperationsMobile']);
+    Route::post('operations/add', ['uses' => 'OperationsController@addOperationsMobile']);
+    Route::post('operations/update', ['uses' => 'OperationsController@updateOperationsMobile']);
+    Route::post('operations/delete', ['uses' => 'OperationsController@deleteOperationsMobile']);
+
+    Route::get('pricelists', ['uses' => 'PricelistsController@getPricelistsMobile']);
+    Route::post('pricelists/add', ['uses' => 'PricelistsController@addPricelistsMobile']);
+    Route::post('pricelists/update', ['uses' => 'PricelistsController@updatePricelistsMobile']);
+    Route::post('pricelists/delete', ['uses' => 'PricelistsController@deletePricelistsMobile']);
+
+    Route::get('discounts', ['uses' => 'DiscountsController@getDiscountsMobile']);
+    Route::post('discounts/add', ['uses' => 'PricelistsController@addDiscountsMobile']);
+    Route::post('discounts/update', ['uses' => 'PricelistsController@updateDiscountsMobile']);
+    Route::post('discounts/delete', ['uses' => 'PricelistsController@deleteDiscountsMobile']);
+
+
+});
+
+
 
 
 

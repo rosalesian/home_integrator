@@ -177,7 +177,103 @@ class PricelistsController extends \BaseController {
             })
             ->make();
     }
+     //mobile get customers
+    public function getPricelistsMobile() {
+        return Pricelist::all();
+    }
+    public function addPricelistsMobile()
+    {
+        $result=Pricelist::searchByReference(Input::get('reference'));
+        if($result != null && $result != "")
+        {
+            $response = [
+                'name' => Input::get('name'),
+                'reference' => Input::get('reference'),
+                'result' => $result,
+                'message' => 'Already Exist'
+            ];
+        }
+        else
+        {
+            $data = [
+                'name' => Input::get('name'),
+                'reference_id' => Input::get('reference'),
+                'user_id' => Auth::user()->id,
+            ];
 
+            $pricelist = Pricelist::create($data);
 
+            $response = [
+                'status_code' => 22,
+                'error' => false,
+                'message' => 'Successfully Added',
+                'id' => $pricelist->id,
+            ];
+        }
+        return Response::json($response);
+    }
 
+    public function updatePricelistsMobile()
+    {
+        $id = Input::get('id');
+        $pricelist = Pricelist::find($id);
+        if($pricelist)
+        {
+            $data = [
+                'name' => Input::get('name'),
+                'reference' => Input::get('reference'),
+                'id' => Input::get('id'),
+                'user_id' => Auth::user()->id,
+                'updated_at' => date('Y-m-d h:i:s')
+            ];
+            $pricelist->update($data);
+            $response = [
+                'message' => 'Successfully Updated',
+                'status_code' => 202,
+                'error' => true,
+                'found' => false,
+                'id' => $pricelist->id
+            ];
+        }
+        else
+        {
+            $response = [
+                'message' => 'Not Found',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => true,
+                'found' => true
+            ];
+        }
+        return Response::json($response);
+    }
+    public function deletePricelistsMobile()
+    {
+        $id = Input::get('id');
+        $pricelist = Pricelist::find($id);
+        if($pricelist != null && $pricelist != "")
+        {
+            $pricelist->delete();
+            $response = [
+                'message' => 'Successfully Deleted',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => false,
+                'found' => false,
+                'data' => $pricelist->id
+            ];
+        }
+        else
+        {
+            $response = [
+                'message' => 'Not Found',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => false,
+                'found' => true,
+                'data' => $pricelist
+            ];
+        }
+        return Response::json($response);
+    }
 }

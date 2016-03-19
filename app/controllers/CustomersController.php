@@ -216,4 +216,104 @@ class CustomersController extends \BaseController {
             })
             ->make();
     }
+
+    //mobile get customers
+    public function getCustomersMobile() {
+        return Customer::all();
+    }
+    public function addCustomersMobile()
+    {
+        $result=Customer::searchByReference(Input::get('reference'));
+        if($result != null && $result != "")
+        {
+            $response = [
+                'name' => Input::get('name'),
+                'reference' => Input::get('reference'),
+                'result' => $result,
+                'message' => 'Already Exist'
+            ];
+        }
+        else
+        {
+            $data = [
+                'name' => Input::get('name'),
+                'reference_id' => Input::get('reference'),
+                'user_id' => Auth::user()->id,
+            ];
+
+            $customer = Customer::create($data);
+
+            $response = [
+                'status_code' => 22,
+                'error' => false,
+                'message' => 'Successfully Added',
+                'id' => $customer->id,
+            ];
+        }
+        return Response::json($response);
+    }
+
+    public function updateCustomersMobile()
+    {
+        $id = Input::get('id');
+        $customer = Customer::find($id);
+        if($customer)
+        {
+            $data = [
+                'name' => Input::get('name'),
+                'reference' => Input::get('reference'),
+                'id' => Input::get('id'),
+                'user_id' => Auth::user()->id,
+                'updated_at' => date('Y-m-d h:i:s')
+            ];
+            $customer->update($data);
+            $response = [
+                'message' => 'Successfully Updated',
+                'status_code' => 202,
+                'error' => true,
+                'id' => $customer->id
+            ];
+        }
+        else
+        {
+            $response = [
+                'message' => 'Not Found',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => true,
+                'data' => $customer
+            ];
+        }
+        return Response::json($response);
+    }
+    public function deleteCustomersMobile()
+    {
+        $id = Input::get('id');
+        $customer = Customer::find($id);
+        if($customer != null && $customer != "")
+        {
+            $customer->delete();
+            $response = [
+                'message' => 'Successfully Deleted',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => false,
+                'found' => false,
+                'data' => $customer->id
+            ];
+        }
+        else
+        {
+            $response = [
+                'message' => 'Not Found',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => false,
+                'found' => true,
+                'data' => $customer
+            ];
+        }
+        return Response::json($response);
+    }
+
 }

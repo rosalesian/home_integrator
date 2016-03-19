@@ -257,4 +257,8 @@ class DiscountsController extends \BaseController {
             })
             ->make();
     }
+     //mobile get customers
+    public function getDiscountsMobile() {
+        return Discount::all();
+    }
 }

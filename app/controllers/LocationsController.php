@@ -176,4 +176,107 @@ class LocationsController extends \BaseController {
     }
 
 
+    //mobile
+    public function getLocationsMobile() {
+        return Location::all();
+    }
+
+    public function addLocationsMobile()
+    {
+        $result=Location::searchByReference(Input::get('reference'));
+        if($result != null && $result != "")
+        {
+            $response = [
+                'name' => Input::get('name'),
+                'reference' => Input::get('reference'),
+                'result' => $result,
+                'found' => true,
+                'message' => 'Already Exist'
+            ];
+        }
+        else
+        {
+            $data = [
+                'name' => Input::get('name'),
+                'reference_id' => Input::get('reference'),
+                'user_id' => Auth::user()->id,
+            ];
+
+            $location = Location::create($data);
+
+            $response = [
+                'status_code' => 22,
+                'error' => false,
+                'found' => false,
+                'message' => 'Successfully Added',
+                'id' => $location->id,
+            ];
+        }
+        return Response::json($response);
+    }
+
+    public function updateLocationsMobile()
+    {
+        $id = Input::get('id');
+        $location = Location::find($id);
+        if($location)
+        {
+
+            $data = [
+                'name' => Input::get('name'),
+                'reference' => Input::get('reference'),
+                'id' => Input::get('id'),
+                'user_id' => Auth::user()->id,
+                'updated_at' => date('Y-m-d h:i:s')
+            ];
+            $location->update($data);
+            $response = [
+                'message' => 'Successfully Updated',
+                'status_code' => 202,
+                'error' => true,
+                'found' => true,
+                'id' => $location->id
+            ];
+        }
+        else
+        {
+            $response = [
+                'message' => 'Not Found',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => true,
+                'found' => false
+            ];
+        }
+        return Response::json($response);
+    }
+    public function deleteLocationsMobile()
+    {
+        $id = Input::get('id');
+        $location = Location::find($id);
+        if($location != null && $location != "")
+        {
+            $location->delete();
+            $response = [
+                'message' => 'Successfully Deleted',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => false,
+                'found' => false,
+                'data' => $location->id
+            ];
+        }
+        else
+        {
+            $response = [
+                'message' => 'Not Found',
+                'status_code' => 302,
+                'id' => Input::get('id'),
+                'error' => false,
+                'found' => true,
+                'data' => $location
+            ];
+        }
+        return Response::json($response);
+    }
 }
